@@ -1,4 +1,6 @@
 from django.contrib import admin
-from .models import Post
+from .models import Professor, Module, Rating
 
-admin.site.register(Post)
+admin.site.register(Professor)
+admin.site.register(Module)
+admin.site.register(Rating)

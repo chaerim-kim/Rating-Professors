@@ -1,20 +1,29 @@
-from django.conf import settings
 from django.db import models
-from django.utils import timezone
+from django.contrib.auth.models import User
 
 
-class Post(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    text = models.TextField()
-    created_date = models.DateTimeField(
-            default=timezone.now)
-    published_date = models.DateTimeField(
-            blank=True, null=True)
+# so use manytomany when, both the one u are referencing and being referenced to
+# can have many values
+# use foreignkey WHEN the thing u are referecing by, cna have 1 foreignkey value
 
-    def publish(self):
-        self.published_date = timezone.now()
-        self.save()
+class Professor(models.Model):
+    professor_id = models.CharField(max_length=15, unique=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
 
-    def __str__(self):
-        return self.title
+
+class Module(models.Model):
+    module_code = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=100)
+    taught_by = models.ForeignKey(Professor, on_delete=models.CASCADE,
+                                  related_name='taught_professor')
+    year = models.IntegerField()
+    semester = models.IntegerField()
+
+
+class Rating(models.Model):
+    by_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rating')  # for reverse relationship
+    rating = models.IntegerField()
+    which_professor = models.ForeignKey(Professor, on_delete=models.CASCADE,
+                                        related_name='professor')
+    which_module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='module')

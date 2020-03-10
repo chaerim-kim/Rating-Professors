@@ -12,13 +12,15 @@ class Professor(models.Model):
     last_name = models.CharField(max_length=30)
 
 
+
+
 class Module(models.Model):
-    module_code = models.CharField(max_length=30, unique=True)
+    module_code = models.CharField(max_length=30)
     name = models.CharField(max_length=100)
-    taught_by = models.ForeignKey(Professor, on_delete=models.CASCADE,
-                                  related_name='taught_professor')
     year = models.IntegerField()
     semester = models.IntegerField()
+    taught_by = models.ManyToManyField(Professor)
+
 
 
 class Rating(models.Model):

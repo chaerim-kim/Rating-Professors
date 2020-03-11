@@ -1,14 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse
-from django.http import (HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound,
-                         HttpResponseServerError)
+from django.http import  HttpResponse, HttpResponseBadRequest,  HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from .models import Professor, Module, Rating
 import json
-from django.http import JsonResponse
-from django.db.models import Count
+from django.db.models import Avg
 
 
 def home(request):
@@ -26,13 +23,16 @@ def HandleRegister(request):
             User.objects.create_user(username=username, email=email, password=password)
             return HttpResponse('user created!')
         else:
-            return HttpResponse ('Username with that email or password already exists')
+            return HttpResponse('Username with that email or password already exists')
 
     return HttpResponse('connected to register! api!')
 
 
 @csrf_exempt
 def HandleLogin(request):
+    if request.user.is_authenticated:
+        return HttpResponse("Already logged in.")
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -45,16 +45,18 @@ def HandleLogin(request):
                 return HttpResponse('Login success for username: {0}'.format(username))
 
             else:
-                return HttpResponse("Your account was inactive.")
+                return HttpResponse("Your account is inactive.")
         else:
             return HttpResponse("Invalid login details supplied for username: {0}".format(username))
 
     return HttpResponse("Login page")
 
 
+
 def HandleLogout(request):
     logout(request)
     return HttpResponse("User logged out")
+
 
 
 @csrf_exempt
@@ -66,28 +68,14 @@ def HandleList(request):
         http_bad_response.content = 'Only GET request is allowed'
         return http_bad_response
 
-    # from ratingapp.models import Professor, Module, Rating
-
-
-    # # PRINTING PROFESSORRRRS
-    # for mod in Module.objects.all():
-    #     for prof in mod.taught_by.all():
-    #         professor_id = prof.professor_id
-    #         first_name = prof.first_name
-    #         last_name = prof.last_name
-    #         print (professor_id, first_name,last_name)
-
-
-    # module_list = Module.objects.all().values()
-
     new_list = []
-    for module in Module.objects.all():
+    for module in Module.objects.all().order_by('module_code', 'semester'):
         module_code = module.module_code
         name = module.name
         year = module.year
         semester = module.semester
 
-        professor_id = module.taught_by.all().values('professor_id') # this gives a queryset
+        professor_id = module.taught_by.all().values('professor_id')  # this gives a queryset
         professor_id2 = professor_id[0]['professor_id']
 
         first_name = module.taught_by.all().values('first_name')
@@ -95,7 +83,6 @@ def HandleList(request):
 
         last_name = module.taught_by.all().values('last_name')
         last_name2 = last_name[0]['last_name']
-
 
         moduleobjects = {
             'module_code': module_code,
@@ -127,7 +114,7 @@ def HandleView(request):
         http_bad_response.content = 'Only GET request is allowed'
         return http_bad_response
 
-    new_list=[]
+    new_list = []
     for rate in Rating.objects.all():
         rating = rate.rating
 
@@ -160,13 +147,46 @@ def HandleAverage(request):
         user_professor_id = request.POST.get('professor_id')
         user_module_code = request.POST.get('module_code')
 
+        rating_for_mod = Rating.objects.filter(which_professor__professor_id=user_professor_id,
+                                               which_module__module_code=user_module_code).aggregate(Avg('rating'))
 
-        rating_for_mod = Rating.objects.filter(professor_id=user_professor_id, module_code=user_module_code)
-        for i in rating_for_mod:
-            print (i)
+        rat = rating_for_mod.get('rating__avg')
 
-            # i.filter(professor_id=user_professor_id, which_module.module_code=user_module_code)
-    # Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
+        payload = {'average_rating': rat}
 
-# @login_required
-# def HandleRate(request):
+        http_response = HttpResponse(json.dumps(payload))
+        http_response['Content-Type'] = 'application/json'
+        http_response.status_code = 200
+        http_response.reason_phrase = 'OK'
+
+        return http_response
+
+
+@csrf_exempt
+def HandleRate(request):
+    if not request.user.is_authenticated:
+        return HttpResponse('You have to be logged in to rate.')
+
+    if request.method == 'POST':
+        user_professor_id = request.POST.get('professor_id')
+        user_module_code = request.POST.get('module_code')
+        user_year = request.POST.get('year')
+        user_semester = request.POST.get('semester')
+        user_rating = request.POST.get('rating')
+
+        prof_search = Professor.objects.get(professor_id=user_professor_id)
+
+        module_search = Module.objects.get(module_code=user_module_code,
+                                           year=user_year,
+                                           semester=user_semester,
+                                           taught_by=prof_search)
+
+        Rating.objects.create(rating=user_rating,
+                              which_professor=prof_search,
+                              which_module=module_search)
+
+        return HttpResponse('Rating created! ')
+
+
+
+    return HttpResponse('Rating page')

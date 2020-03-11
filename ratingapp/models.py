@@ -20,14 +20,13 @@ class Module(models.Model):
     taught_by = models.ManyToManyField(Professor)
 
     def __str__(self):
-        return u'%s %s %d %d %s' % (self.module_code, self.name, self.year, self.semester, self.taught_by)
+        return u'%s %s %d %d' % (self.module_code, self.name, self.year, self.semester)
 
 
 class Rating(models.Model):
-    by_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rating')  # for reverse relationship
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     which_professor = models.ForeignKey(Professor, on_delete=models.CASCADE )
     which_module = models.ForeignKey(Module, on_delete=models.CASCADE)
 
-    # def __str__(self):
-    #     return u'%d% %s %s' % (self.rating, self.professor_id, self.module_code)
+    def __str__(self):
+        return u'%s %s %s' % (self.rating, self.which_professor.professor_id, self.which_module.module_code)

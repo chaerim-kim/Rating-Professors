@@ -10,5 +10,5 @@ urlpatterns = [
     path('api/list/', views.HandleList),
     path('api/view/', views.HandleView),
     path('api/average/', views.HandleAverage),
-    # path('api/rate/', views.HandleRate),
+    path('api/rate/', views.HandleRate),
 ]

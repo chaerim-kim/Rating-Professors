@@ -15,7 +15,7 @@ def main():
         if len(sys.argv) == 3:
             login(sys.argv[2])
         else:
-            print ('Specify login url.')
+            print('Specify login url.')
 
     elif sys.argv[1] == 'logout':
         logout()
@@ -30,14 +30,13 @@ def main():
         if len(sys.argv) == 4:
             average(sys.argv[2], sys.argv[3])
         else:
-            print ('Specify the professor ID and module code.')
+            print('Specify the professor ID and module code.')
 
     elif sys.argv[1] == 'rate':
         if len(sys.argv) == 7:
-            rate(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],sys.argv[6])
+            rate(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
         else:
-            print ('Specify the professor ID, module code, year, semester and rating.')
-
+            print('Specify the professor ID, module code, year, semester and rating.')
 
 
 def register():
@@ -75,16 +74,19 @@ def login(user_url):
 
     # send a request to api
     r = requests.post(url, data=post_data)
-    print(r.status_code)
+
     print(r.content)
+    print(r.status_code)
 
 
 # send logout request
 def logout():
     url = 'http://127.0.0.1:8000/api/logout/'
     r = requests.get(url)
+
     print(r.status_code)
     print(r.content)
+
 
 
 def list():
@@ -96,9 +98,6 @@ def list():
     parsed = json.loads(r.text)
     module_list = parsed['module_list']
 
-    # print labels
-    # print("{:<8} {:<8} {:<8} {:<15} {:<20}".format('Code', 'Name', 'Year', 'Semester', 'Taught by'))
-
     print_list = []
     for i in module_list:
         moduleobjects = {
@@ -106,21 +105,17 @@ def list():
             'Name': i.get('name'),
             'Year': i.get('year'),
             'Semester': i.get('semester'),
-            'professor_id': i.get('professor_id'),
-            'first_name': i.get('first_name'),
-            'last_name': i.get('last_name')
+            'Professor': i.get('professor_id') + ', Professor ' + i.get('first_name') + '. ' + i.get('last_name')
         }
-        # print (moduleobjects)
 
         print_list.append(moduleobjects)
 
-    print("=" * 90)
+    print("=" * 80)
 
-    # print(pandas.DataFrame(print_list, headers, headers))
     print(pandas.DataFrame(print_list).reindex(
-        columns=['Code', 'Name', 'Year', 'Semester', 'professor_id', 'first_name', 'last_name']))
+        columns=['Code', 'Name', 'Year', 'Semester', 'Professor']))
 
-    print("=" * 90)
+    print("=" * 80)
 
     print(r.status_code)
 
@@ -145,36 +140,40 @@ def view():
     print(r.status_code)
 
 
-def average(professor_id,module_code):
-
+def average(professor_id, module_code):
     # send a request to api along with data
     url = 'http://127.0.0.1:8000/api/average/'
     post_data = {
         'professor_id': professor_id,
         'module_code': module_code
     }
-
     # send a request to api
     r = requests.post(url, data=post_data)
+
+    parsed = json.loads(r.text)
+    rating__avg = parsed['average_rating']
+
+
+    print("The rating of Professor {0} in module {1} is {2}.".format(professor_id, module_code, rating__avg))
     print(r.status_code)
 
 
 def rate(professor_id, module_code, year, semester, rating):
-    print('Not yert')
 
-    # # send a request to api along with data
-    # url = 'http://127.0.0.1:8000/api/rate/'
-    # post_data = {
-    #     'professor_id': professor_id,
-    #     'module_code': module_code,
-    #     'year': year,
-    #     'semester': semester,
-    #     'rating': rating
-    # }
-    #
-    # # send a request to api
-    # r = requests.post(url, data=post_data)
-    # print(r.status_code)
+    # send a request to api along with data
+    url = 'http://127.0.0.1:8000/api/rate/'
+    post_data = {
+        'professor_id': professor_id,
+        'module_code': module_code,
+        'year': year,
+        'semester': semester,
+        'rating': rating
+    }
+
+    # send a request to api
+    r = requests.post(url, data=post_data)
+    print(r.status_code)
+    print(r.content)
 
 
 if __name__ == "__main__":

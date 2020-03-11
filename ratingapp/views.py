@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Professor, Module, Rating
 import json
 from django.http import JsonResponse
+from django.db.models import Count
 
 
 def home(request):
@@ -65,28 +66,45 @@ def HandleList(request):
         http_bad_response.content = 'Only GET request is allowed'
         return http_bad_response
 
+    # from ratingapp.models import Professor, Module, Rating
 
-    # for valid requests
-    module_list = Module.objects.all().values('module_code', 'name', 'year', 'semester', 'taught_by')
 
-    mod = Module.objects.all()
-    prof = mod.taught_by.all()
-    print(prof)
-    # prof2 = prof.professor_set.value('professor_id')
-    # print(prof2)
+    # # PRINTING PROFESSORRRRS
+    # for mod in Module.objects.all():
+    #     for prof in mod.taught_by.all():
+    #         professor_id = prof.professor_id
+    #         first_name = prof.first_name
+    #         last_name = prof.last_name
+    #         print (professor_id, first_name,last_name)
 
-    # if module code, year, semester is the same, combine it into one!!
-    # Professor.objects.filter()
 
+    # module_list = Module.objects.all().values()
 
     new_list = []
-    for module in module_list:
+    for module in Module.objects.all():
+        module_code = module.module_code
+        name = module.name
+        year = module.year
+        semester = module.semester
+
+        professor_id = module.taught_by.all().values('professor_id') # this gives a queryset
+        professor_id2 = professor_id[0]['professor_id']
+
+        first_name = module.taught_by.all().values('first_name')
+        first_name2 = first_name[0]['first_name']
+
+        last_name = module.taught_by.all().values('last_name')
+        last_name2 = last_name[0]['last_name']
+
+
         moduleobjects = {
-            'module_code': module.get('module_code'),
-            'name': module.get('name'),
-            'year': module.get('year'),
-            'semester': module.get('semester'),
-            'taught_by': module.get('taught_by')
+            'module_code': module_code,
+            'name': name,
+            'year': year,
+            'semester': semester,
+            'professor_id': professor_id2,
+            'first_name': first_name2,
+            'last_name': last_name2
         }
 
         new_list.append(moduleobjects)
@@ -101,7 +119,6 @@ def HandleList(request):
     return http_response
 
 
-
 def HandleView(request):
     http_bad_response = HttpResponseBadRequest()
     http_bad_response['Content-Type'] = 'text/plain'
@@ -110,25 +127,24 @@ def HandleView(request):
         http_bad_response.content = 'Only GET request is allowed'
         return http_bad_response
 
-    prof_rating = Rating.objects.all().values('which_professor', 'rating')
+    new_list=[]
+    for rate in Rating.objects.all():
+        rating = rate.rating
 
-    # rr = Rating.objects.all()
-    # whichhh = rr.professor.all() # this is fetching all professors from rating modell
-    # print (whichhh)
+        # accessing foreign key values
+        first_name = rate.which_professor.first_name
+        last_name = rate.which_professor.last_name
+        code = rate.which_professor.professor_id
 
-    new_list = []
-    for rating in prof_rating:
         ratingobjects = {
-            # 'professor_id': rating.get('which_professor').get('professor_id'),
-            # 'first_name': rating['which_professor']['first_name'],
-            # 'last_name': rating['which_professor']['last_name'],
-            'rating': rating.get('rating')
+            'rating': rating,
+            'first_name': first_name,
+            'last_name': last_name,
+            'code': code
         }
-
         new_list.append(ratingobjects)
-    print (new_list)
 
-    payload = {'module_list': new_list}
+    payload = {'rating_list': new_list}
 
     http_response = HttpResponse(json.dumps(payload))
     http_response['Content-Type'] = 'application/json'
@@ -140,14 +156,15 @@ def HandleView(request):
 
 def HandleAverage(request):
     if request.method == 'POST':
-        professor_id = request.POST.get('professor_id')
-        module_code = request.POST.get('module_code')
+        user_professor_id = request.POST.get('professor_id')
+        user_module_code = request.POST.get('module_code')
 
-    #### SORT OUT HOW TO CALL SPECIFIC foreign key value
 
-        # Rating.objects.filter(which_professor=professor_id, which_module=module_code)
-        # Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
+        rating_for_mod = Rating.objects.all()
+        real = rating_for_mod.filter(which_professor.professor_id=user_professor_id, which_module.module_code=user_module_code)
+        for i in rating_for_mod:
+            i.filter(.professor_id=user_professor_id, which_module.module_code=user_module_code)
+    # Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
 
 # @login_required
 # def HandleRate(request):
-

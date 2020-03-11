@@ -1,5 +1,6 @@
 import requests
 import json
+import pandas
 
 
 def main():
@@ -46,6 +47,7 @@ def main():
 
     elif option == 'rate':
         rate()
+
 
 # !!!!!!!!! simply displays the data returned by the service in a human readable format.
 # send request AND
@@ -99,7 +101,6 @@ def logout():
     print(r.content)
 
 
-
 def list():
     # sending request
     url = 'http://127.0.0.1:8000/api/list/'
@@ -109,21 +110,32 @@ def list():
     parsed = json.loads(r.text)
     module_list = parsed['module_list']
 
+    # print labels
+    # print("{:<8} {:<8} {:<8} {:<15} {:<20}".format('Code', 'Name', 'Year', 'Semester', 'Taught by'))
 
+    print_list = []
     for i in module_list:
         moduleobjects = {
-            'module_code':  i.get('module_code'),
-            'name': i.get('name'),
-            'year': i.get('year'),
-            'semester': i.get('semester'),
-            'taught_by': i.get('taught_by')
+            'Code': i.get('module_code'),
+            'Name': i.get('name'),
+            'Year': i.get('year'),
+            'Semester': i.get('semester'),
+            'professor_id': i.get('professor_id'),
+            'first_name': i.get('first_name'),
+            'last_name': i.get('last_name')
         }
+        # print (moduleobjects)
 
-        # module_code = i.get('module_code')
-        # name = i.get('name')
-        # print('{}, {}'.format(module_code, name))
+        print_list.append(moduleobjects)
 
-        print (moduleobjects)
+    print("=" * 90)
+
+    # print(pandas.DataFrame(print_list, headers, headers))
+    print(pandas.DataFrame(print_list).reindex(
+        columns=['Code', 'Name', 'Year', 'Semester', 'professor_id', 'first_name', 'last_name']))
+
+    print("=" * 90)
+
     print(r.status_code)
 
 
@@ -132,9 +144,19 @@ def view():
     url = 'http://127.0.0.1:8000/api/view/'
     r = requests.get(url)
 
-    print(r.content)
-    print(r.status_code)
+    # parsing objects
+    parsed = json.loads(r.text)
+    rating_list = parsed['rating_list']
 
+    for i in rating_list:
+        rating = i.get('rating')
+        first = i.get('first_name')
+        last = i.get('last_name')
+        code = i.get('code')
+
+        print("The rating of Professor {0}. {1} ({2}) is {3}.".format(first, last, code, rating))
+
+    print(r.status_code)
 
 
 def average():

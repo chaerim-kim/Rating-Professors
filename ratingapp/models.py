@@ -29,5 +29,5 @@ class Rating(models.Model):
     which_professor = models.ForeignKey(Professor, on_delete=models.CASCADE )
     which_module = models.ForeignKey(Module, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return u'%d% %s %s' % (self.rating, self.which_professor.professor_id. self.which_module.module_code)
+    # def __str__(self):
+    #     return u'%d% %s %s' % (self.rating, self.professor_id, self.module_code)

@@ -154,16 +154,18 @@ def HandleView(request):
     return http_response
 
 
+@csrf_exempt
 def HandleAverage(request):
     if request.method == 'POST':
         user_professor_id = request.POST.get('professor_id')
         user_module_code = request.POST.get('module_code')
 
 
-        rating_for_mod = Rating.objects.all()
-        real = rating_for_mod.filter(which_professor.professor_id=user_professor_id, which_module.module_code=user_module_code)
+        rating_for_mod = Rating.objects.filter(professor_id=user_professor_id, module_code=user_module_code)
         for i in rating_for_mod:
-            i.filter(.professor_id=user_professor_id, which_module.module_code=user_module_code)
+            print (i)
+
+            # i.filter(professor_id=user_professor_id, which_module.module_code=user_module_code)
     # Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
 
 # @login_required

@@ -26,7 +26,7 @@ def HandleRegister(request):
             User.objects.create_user(username=username, email=email, password=password)
             return HttpResponse('user created!')
         else:
-            return HttpResponse('Username with that email or password already exists')
+            return HttpResponse ('Username with that email or password already exists')
 
     return HttpResponse('connected to register! api!')
 

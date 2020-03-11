@@ -1,58 +1,43 @@
 import requests
 import json
 import pandas
+import sys
 
 
 def main():
-    # # This parses the inputs from the command line!)
-    # parser = argparse.ArgumentParser(description='Input a function!')
-    #
-    # #  positional argument
-    # parser.add_argument('option',   help="Which function would you like to run?")
-    # # parser.add_argument('optional', nargs='+', dest='argvars', help="Which function would you like to run?")
-    #
-    # args = parser.parse_args()
+    if len(sys.argv) == 1:
+        print('Invalid command - Enter your options.')
 
-    print("\n\nPlease select the command to execute.")
-    print("1. To register: please type 'register'")
-    print("2. To login: please type 'login url', with required argument(s).")
-    print("3. To logout: type: 'logout'")
-    print("4. To view a list of all module instances and the professors: type: 'list'")
-    print("5. To view the rating of all professors : type'view'")
-    print(
-        "6. To view the average rating of a certain professor in a certain module: type: 'average professor_id module_code' with required argument(s).")
-    print(
-        "7. To rate the teaching of a certain professor in a cetain module: type: 'rate professor_id module_code year semester rating'with required argument(s).")
-    print("\n")
-
-    option = input("Please select the menu : ")
-
-    if option == 'register':
+    elif sys.argv[1] == 'register':
         register()
 
-    elif option == 'login':
-        login()
+    elif sys.argv[1] == 'login':
+        if len(sys.argv) == 3:
+            login(sys.argv[2])
+        else:
+            print ('Specify login url.')
 
-    elif option == 'logout':
+    elif sys.argv[1] == 'logout':
         logout()
 
-    elif option == 'list':
+    elif sys.argv[1] == 'list':
         list()
 
-    elif option == 'view':
+    elif sys.argv[1] == 'view':
         view()
 
-    elif option == 'average':
-        average()
+    elif sys.argv[1] == 'average':
+        if len(sys.argv) == 4:
+            average(sys.argv[2], sys.argv[3])
+        else:
+            print ('Specify the professor ID and module code.')
 
-    elif option == 'rate':
-        rate()
+    elif sys.argv[1] == 'rate':
+        if len(sys.argv) == 7:
+            rate(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],sys.argv[6])
+        else:
+            print ('Specify the professor ID, module code, year, semester and rating.')
 
-
-# !!!!!!!!! simply displays the data returned by the service in a human readable format.
-# send request AND
-# process the response
-# display to user
 
 
 def register():
@@ -75,13 +60,14 @@ def register():
     print(r.content)
 
 
-def login():
+def login(user_url):
     # prompt the user for deatils
     username = input("Enter username : ")
     password = input("Enter password : ")
 
     # send a request to api along with data
-    url = 'http://127.0.0.1:8000/api/login/'
+    # url = 'http://127.0.0.1:8000/api/login/'
+    url = user_url
     post_data = {
         'username': username,
         'password': password
@@ -159,9 +145,7 @@ def view():
     print(r.status_code)
 
 
-def average():
-    professor_id = input("Enter professor id : ")
-    module_code = input("Enter module code : ")
+def average(professor_id,module_code):
 
     # send a request to api along with data
     url = 'http://127.0.0.1:8000/api/average/'
@@ -175,22 +159,22 @@ def average():
     print(r.status_code)
 
 
-# def rate():
-#     professor_id, module_code,year,semester,rating = input("Enter professor_id, module_code,year,semester,rating : ").split()
-#
-#     # send a request to api along with data
-#     url = 'http://127.0.0.1:8000/api/rate/'
-#     post_data = {
-#         'professor_id': professor_id,
-#         'module_code': module_code,
-#         'year': year,
-#         'semester': semester,
-#         'rating': rating
-#     }
-#
-#     # send a request to api
-#     r = requests.post(url, data=post_data)
-#     print(r.status_code)
+def rate(professor_id, module_code, year, semester, rating):
+    print('Not yert')
+
+    # # send a request to api along with data
+    # url = 'http://127.0.0.1:8000/api/rate/'
+    # post_data = {
+    #     'professor_id': professor_id,
+    #     'module_code': module_code,
+    #     'year': year,
+    #     'semester': semester,
+    #     'rating': rating
+    # }
+    #
+    # # send a request to api
+    # r = requests.post(url, data=post_data)
+    # print(r.status_code)
 
 
 if __name__ == "__main__":

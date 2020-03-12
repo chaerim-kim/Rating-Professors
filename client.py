@@ -1,47 +1,63 @@
 import requests
 import json
 import pandas
-import sys
+
+# To check login status
+loggedin = 0
 
 
 def main():
-    if len(sys.argv) == 1:
-        print('Invalid command - Enter your options.')
+    while True:
+        print("\n\nPlease select the command to execute.")
+        print("1. To register, type 'register'")
+        print("2. To login, type 'login url', with required argument(s).")
+        print("3. To logout, type 'logout'")
+        print("4. To view a list of all module instances and the professors, type 'list'")
+        print("5. To view the rating of all professors, type 'view'")
+        print(
+            "6. To view the average rating of a certain professor in a certain module, type 'average professor_id module_code' with required argument(s).")
+        print(
+            "7. To rate the teaching of a certain professor in a cetain module, type 'rate professor_id module_code year semester rating'with required argument(s).")
+        print("\n")
 
-    elif sys.argv[1] == 'register':
-        register()
+        option = input("Please select the menu : ")
+        userinput = option.split()
 
-    elif sys.argv[1] == 'login':
-        if len(sys.argv) == 3:
-            login(sys.argv[2])
-        else:
-            print('Specify login url.')
+        if userinput[0] == 'register':
+            register()
 
-    elif sys.argv[1] == 'logout':
-        logout()
+        elif userinput[0] == 'login':
+            if len(userinput) == 2:
+                login(userinput[1])
+            else:
+                print('Specify login url.')
 
-    elif sys.argv[1] == 'list':
-        list()
+        elif userinput[0] == 'logout':
+            logout()
 
-    elif sys.argv[1] == 'view':
-        view()
+        elif userinput[0] == 'list':
+            list()
 
-    elif sys.argv[1] == 'average':
-        if len(sys.argv) == 4:
-            average(sys.argv[2], sys.argv[3])
-        else:
-            print('Specify the professor ID and module code.')
+        elif userinput[0] == 'view':
+            view()
 
-    elif sys.argv[1] == 'rate':
-        if len(sys.argv) == 7:
-            rate(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
-        else:
-            print('Specify the professor ID, module code, year, semester and rating.')
+        elif userinput[0] == 'average':
+            if len(userinput) == 3:
+                average(userinput[1], userinput[2])
+            else:
+                print('Specify the professor ID and module code.')
 
-loggedin = 0
+        elif userinput[0] == 'rate':
+            if len(userinput) == 6:
+                rate(userinput[1], userinput[2], userinput[3], userinput[4], userinput[5])
+            else:
+                print('Specify the professor ID, module code, year, semester and rating.')
+
 
 def register():
-    # prompt the user for deatils
+    session = requests.Session()
+
+    # prompt the user for details
     username = input("Enter username : ")
     email = input("Enter email : ")
     password = input("Enter password : ")
@@ -55,59 +71,58 @@ def register():
     }
 
     # send a request to api
-    r = requests.post(url, data=post_data)
-    print(r.status_code)
+    r = session.post(url, data=post_data)
+    # print(r.status_code)
     print(r.content)
 
 
 def login(user_url):
     global loggedin
-    print(loggedin)
 
-    if loggedin == 0:
-        # prompt the user for deatils
-        username = input("Enter username : ")
-        password = input("Enter password : ")
+    session = requests.Session()
 
-        # send a request to api along with data
-        # url = 'http://127.0.0.1:8000/api/login/'
-        url = user_url
-        post_data = {
-            'username': username,
-            'password': password
-        }
+    # prompt the user for deatils
+    username = input("Enter username : ")
+    password = input("Enter password : ")
 
-        # send a request to api
-        r = requests.post(url, data=post_data)
+    # send a request to api along with data
+    # url = 'http://127.0.0.1:8000/api/login/'
+    url = user_url
+    post_data = {
+        'username': username,
+        'password': password
+    }
 
-        if r.status_code == 200:
-            loggedin = 1
-            print('loggedin set to true')
+    # send a request to api
+    r = session.post(url, data=post_data)
 
-    # print(r.content)
+    if r.status_code == 200:
+        loggedin = 1
+
+    print(r.content)
     # print(r.status_code)
-
-
 
 
 # send logout request
 def logout():
     global loggedin
 
-    url = 'http://127.0.0.1:8000/api/logout/'
-    r = requests.get(url)
+    session = requests.Session()
 
-    if r.status_code==200:
-        loggedin = 0
-    print(r.status_code)
+    url = 'http://127.0.0.1:8000/api/logout/'
+    r = session.get(url)
+
+    loggedin = 0
+    # print(r.status_code)
     print(r.content)
 
 
-
 def list():
+    session = requests.Session()
+
     # sending request
     url = 'http://127.0.0.1:8000/api/list/'
-    r = requests.get(url)
+    r = session.get(url)
 
     # parsing objects
     parsed = json.loads(r.text)
@@ -132,13 +147,15 @@ def list():
 
     print("=" * 80)
 
-    print(r.status_code)
+    # print(r.status_code)
 
 
 def view():
+    session = requests.Session()
+
     # send request
     url = 'http://127.0.0.1:8000/api/view/'
-    r = requests.get(url)
+    r = session.get(url)
 
     # parsing objects
     parsed = json.loads(r.text)
@@ -146,16 +163,28 @@ def view():
 
     for i in rating_list:
         rating = i.get('rating')
-        first = i.get('first_name')
-        last = i.get('last_name')
         code = i.get('code')
+
+        if code == 'JE1':
+            first = 'J'
+            last = 'Excellent'
+
+        elif code == 'TT1':
+            first = 'T'
+            last = 'Terrible'
+
+        elif code == 'VS1':
+            first = 'V'
+            last = 'Smart'
 
         print("The rating of Professor {0}. {1} ({2}) is {3}.".format(first, last, code, rating))
 
-    print(r.status_code)
+    # print(r.status_code)
 
 
 def average(professor_id, module_code):
+    session = requests.Session()
+
     # send a request to api along with data
     url = 'http://127.0.0.1:8000/api/average/'
     post_data = {
@@ -163,21 +192,21 @@ def average(professor_id, module_code):
         'module_code': module_code
     }
     # send a request to api
-    r = requests.post(url, data=post_data)
+    r = session.post(url, data=post_data)
 
     parsed = json.loads(r.text)
     rating__avg = parsed['average_rating']
 
-
     print("The rating of Professor {0} in module {1} is {2}.".format(professor_id, module_code, rating__avg))
-    print(r.status_code)
+    # print(r.status_code)
 
 
 def rate(professor_id, module_code, year, semester, rating):
     global loggedin
 
-    print(loggedin)
     if loggedin == 1:
+        session = requests.Session()
+
         # send a request to api along with data
         url = 'http://127.0.0.1:8000/api/rate/'
         post_data = {
@@ -189,11 +218,12 @@ def rate(professor_id, module_code, year, semester, rating):
         }
 
         # send a request to api
-        r = requests.post(url, data=post_data)
-        print(r.status_code)
+        r = session.post(url, data=post_data)
+        # print(r.status_code)
         print(r.content)
+
     else:
-        print('you have to log in')
+        print('You have to log in to rate.')
 
 
 if __name__ == "__main__":

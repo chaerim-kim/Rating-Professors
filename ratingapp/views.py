@@ -1,16 +1,15 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from django.http import  HttpResponse, HttpResponseBadRequest,  HttpResponseRedirect
 from django.contrib.auth.models import User
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Avg
 from .models import Professor, Module, Rating
 import json
-from django.db.models import Avg
+from decimal import *
 
 
 def home():
     return HttpResponse('Homepage of COMP3011 Coursework 1')
-
 
 
 @csrf_exempt
@@ -31,10 +30,6 @@ def HandleRegister(request):
 
 @csrf_exempt
 def HandleLogin(request):
-    # if request.user.is_authenticated:
-    #     return HttpResponse("Already logged in.")
-
-
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -44,9 +39,8 @@ def HandleLogin(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                # return HttpResponse('Login success for username: {0}'.format(username))
-
-                return HttpResponse(status=200)
+                return HttpResponse('Login success for username: {0}'.format(username))
+                # return HttpResponse(status=200)
 
             else:
                 return HttpResponse("Your account is inactive.")
@@ -56,11 +50,9 @@ def HandleLogin(request):
     return HttpResponse("Login page")
 
 
-
 def HandleLogout(request):
     logout(request)
     return HttpResponse("User logged out")
-
 
 
 @csrf_exempt
@@ -119,19 +111,19 @@ def HandleView(request):
         return http_bad_response
 
     new_list = []
-    for rate in Rating.objects.all():
-        rating = rate.rating
+    prof_list = []
+    for prof_id in Professor.objects.all().values('professor_id'):
+        prof_id_get = prof_id.get('professor_id')
+        prof_list.append(prof_id_get)
 
-        # accessing foreign key values
-        first_name = rate.which_professor.first_name
-        last_name = rate.which_professor.last_name
-        code = rate.which_professor.professor_id
+    for professor in prof_list:
+        rating_prof = Rating.objects.filter(which_professor__professor_id=professor).aggregate(Avg('rating'))
+        raw_rating = rating_prof.get('rating__avg')
+        rounded = int(Decimal(raw_rating).quantize(Decimal('1'), rounding=ROUND_HALF_UP))
 
         ratingobjects = {
-            'rating': rating,
-            'first_name': first_name,
-            'last_name': last_name,
-            'code': code
+            'code': professor,
+            'rating': rounded
         }
         new_list.append(ratingobjects)
 
@@ -155,8 +147,9 @@ def HandleAverage(request):
                                                which_module__module_code=user_module_code).aggregate(Avg('rating'))
 
         rat = rating_for_mod.get('rating__avg')
+        rounded = int(Decimal(rat).quantize(Decimal('1'), rounding=ROUND_HALF_UP))
 
-        payload = {'average_rating': rat}
+        payload = {'average_rating': rounded}
 
         http_response = HttpResponse(json.dumps(payload))
         http_response['Content-Type'] = 'application/json'
@@ -168,8 +161,6 @@ def HandleAverage(request):
 
 @csrf_exempt
 def HandleRate(request):
-
-    # if request.user.is_authenticated:
     if request.method == 'POST':
         user_professor_id = request.POST.get('professor_id')
         user_module_code = request.POST.get('module_code')
@@ -188,10 +179,6 @@ def HandleRate(request):
                               which_professor=prof_search,
                               which_module=module_search)
 
-    return HttpResponse('Rating created! ')
-
-    # else:
-    #     return HttpResponse('You have to be logged in to rate.')
-
+        return HttpResponse('Rating created! ')
 
     return HttpResponse('Rating page')

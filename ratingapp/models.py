@@ -20,7 +20,8 @@ class Module(models.Model):
     taught_by = models.ManyToManyField(Professor)
 
     def __str__(self):
-        return u'%s %s %d %d' % (self.module_code, self.name, self.year, self.semester)
+        taught_by = ", ".join(str(seg) for seg in self.taught_by.all())
+        return u'%s %s %d %d' % (self.module_code, taught_by, self.year, self.semester)
 
 
 class Rating(models.Model):

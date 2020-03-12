@@ -38,6 +38,7 @@ def main():
         else:
             print('Specify the professor ID, module code, year, semester and rating.')
 
+loggedin = 0
 
 def register():
     # prompt the user for deatils
@@ -60,30 +61,44 @@ def register():
 
 
 def login(user_url):
-    # prompt the user for deatils
-    username = input("Enter username : ")
-    password = input("Enter password : ")
+    global loggedin
+    print(loggedin)
 
-    # send a request to api along with data
-    # url = 'http://127.0.0.1:8000/api/login/'
-    url = user_url
-    post_data = {
-        'username': username,
-        'password': password
-    }
+    if loggedin == 0:
+        # prompt the user for deatils
+        username = input("Enter username : ")
+        password = input("Enter password : ")
 
-    # send a request to api
-    r = requests.post(url, data=post_data)
+        # send a request to api along with data
+        # url = 'http://127.0.0.1:8000/api/login/'
+        url = user_url
+        post_data = {
+            'username': username,
+            'password': password
+        }
 
-    print(r.content)
-    print(r.status_code)
+        # send a request to api
+        r = requests.post(url, data=post_data)
+
+        if r.status_code == 200:
+            loggedin = 1
+            print('loggedin set to true')
+
+    # print(r.content)
+    # print(r.status_code)
+
+
 
 
 # send logout request
 def logout():
+    global loggedin
+
     url = 'http://127.0.0.1:8000/api/logout/'
     r = requests.get(url)
 
+    if r.status_code==200:
+        loggedin = 0
     print(r.status_code)
     print(r.content)
 
@@ -159,21 +174,26 @@ def average(professor_id, module_code):
 
 
 def rate(professor_id, module_code, year, semester, rating):
+    global loggedin
 
-    # send a request to api along with data
-    url = 'http://127.0.0.1:8000/api/rate/'
-    post_data = {
-        'professor_id': professor_id,
-        'module_code': module_code,
-        'year': year,
-        'semester': semester,
-        'rating': rating
-    }
+    print(loggedin)
+    if loggedin == 1:
+        # send a request to api along with data
+        url = 'http://127.0.0.1:8000/api/rate/'
+        post_data = {
+            'professor_id': professor_id,
+            'module_code': module_code,
+            'year': year,
+            'semester': semester,
+            'rating': rating
+        }
 
-    # send a request to api
-    r = requests.post(url, data=post_data)
-    print(r.status_code)
-    print(r.content)
+        # send a request to api
+        r = requests.post(url, data=post_data)
+        print(r.status_code)
+        print(r.content)
+    else:
+        print('you have to log in')
 
 
 if __name__ == "__main__":

@@ -8,8 +8,9 @@ import json
 from django.db.models import Avg
 
 
-def home(request):
-    return HttpResponse('Hello, World!')
+def home():
+    return HttpResponse('Homepage of COMP3011 Coursework 1')
+
 
 
 @csrf_exempt
@@ -30,8 +31,9 @@ def HandleRegister(request):
 
 @csrf_exempt
 def HandleLogin(request):
-    if request.user.is_authenticated:
-        return HttpResponse("Already logged in.")
+    # if request.user.is_authenticated:
+    #     return HttpResponse("Already logged in.")
+
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -42,7 +44,9 @@ def HandleLogin(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return HttpResponse('Login success for username: {0}'.format(username))
+                # return HttpResponse('Login success for username: {0}'.format(username))
+
+                return HttpResponse(status=200)
 
             else:
                 return HttpResponse("Your account is inactive.")
@@ -164,9 +168,8 @@ def HandleAverage(request):
 
 @csrf_exempt
 def HandleRate(request):
-    if not request.user.is_authenticated:
-        return HttpResponse('You have to be logged in to rate.')
 
+    # if request.user.is_authenticated:
     if request.method == 'POST':
         user_professor_id = request.POST.get('professor_id')
         user_module_code = request.POST.get('module_code')
@@ -185,8 +188,10 @@ def HandleRate(request):
                               which_professor=prof_search,
                               which_module=module_search)
 
-        return HttpResponse('Rating created! ')
+    return HttpResponse('Rating created! ')
 
+    # else:
+    #     return HttpResponse('You have to be logged in to rate.')
 
 
     return HttpResponse('Rating page')

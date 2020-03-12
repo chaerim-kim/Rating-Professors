@@ -63,7 +63,7 @@ def register():
     password = input("Enter password : ")
 
     # send a request to api along with data
-    url = 'http://127.0.0.1:8000/api/register/'
+    url = 'http://sc17crk.pythonanywhere.com/api/register/'
     post_data = {
         'username': username,
         'email': email,
@@ -86,7 +86,6 @@ def login(user_url):
     password = input("Enter password : ")
 
     # send a request to api along with data
-    # url = 'http://127.0.0.1:8000/api/login/'
     url = user_url
     post_data = {
         'username': username,
@@ -109,7 +108,7 @@ def logout():
 
     session = requests.Session()
 
-    url = 'http://127.0.0.1:8000/api/logout/'
+    url = 'http://sc17crk.pythonanywhere.com/api/logout/'
     r = session.get(url)
 
     loggedin = 0
@@ -121,7 +120,7 @@ def list():
     session = requests.Session()
 
     # sending request
-    url = 'http://127.0.0.1:8000/api/list/'
+    url = 'http://sc17crk.pythonanywhere.com/api/list/'
     r = session.get(url)
 
     # parsing objects
@@ -154,7 +153,7 @@ def view():
     session = requests.Session()
 
     # send request
-    url = 'http://127.0.0.1:8000/api/view/'
+    url = 'http://sc17crk.pythonanywhere.com/api/view/'
     r = session.get(url)
 
     # parsing objects
@@ -186,7 +185,7 @@ def average(professor_id, module_code):
     session = requests.Session()
 
     # send a request to api along with data
-    url = 'http://127.0.0.1:8000/api/average/'
+    url = 'http://sc17crk.pythonanywhere.com/api/average/'
     post_data = {
         'professor_id': professor_id,
         'module_code': module_code
@@ -208,7 +207,7 @@ def rate(professor_id, module_code, year, semester, rating):
         session = requests.Session()
 
         # send a request to api along with data
-        url = 'http://127.0.0.1:8000/api/rate/'
+        url = 'http://sc17crk.pythonanywhere.com/api/rate/'
         post_data = {
             'professor_id': professor_id,
             'module_code': module_code,

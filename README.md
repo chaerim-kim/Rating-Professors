@@ -27,25 +27,25 @@ Rate | /api/rate/ | Rate the teaching of the professor in a certain module insta
 
 
 ## 🐾 Examples / 사용 예제
-- Main Command Line Interface
+- Main Command Line Interface  
 ![Screenshot 2020-12-01 at 3 37 52 pm](https://user-images.githubusercontent.com/33334078/100707710-6da9a700-33ee-11eb-824d-dc303a4f7416.png)
 
-1. Register
+1. Register  
 ![Screenshot 2020-12-01 at 4 02 22 pm](https://user-images.githubusercontent.com/33334078/100707805-9af65500-33ee-11eb-9e24-09ed4e526054.png)
 
-2. Login / logout
+2. Login / logout  
 ![Screenshot 2020-12-01 at 3 43 42 pm](https://user-images.githubusercontent.com/33334078/100707179-98473000-33ed-11eb-8c2c-b89796c5318c.png)
 
-3. List
+3. List  
 ![Screenshot 2020-12-01 at 3 42 08 pm](https://user-images.githubusercontent.com/33334078/100707157-8ebdc800-33ed-11eb-9956-80212643baec.png)
 
-4. View
+4. View  
 ![Screenshot 2020-12-01 at 3 42 02 pm](https://user-images.githubusercontent.com/33334078/100707129-836a9c80-33ed-11eb-9b6b-766732b9f690.png)
 
-5. Average
+5. Average  
 ![Screenshot 2020-12-01 at 3 44 09 pm](https://user-images.githubusercontent.com/33334078/100707197-a006d480-33ed-11eb-874f-cd8be77178c0.png)
 
-6. Rate
+6. Rate  
 ![Screenshot 2020-12-01 at 3 45 29 pm](https://user-images.githubusercontent.com/33334078/100707203-a1380180-33ed-11eb-880e-9423f1a4f4ed.png)
 
 

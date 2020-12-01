@@ -1,5 +1,5 @@
 # Rate and View Professors
-> 👩🏻‍💻 Rate and view the ratings of your professors from various modules, semesters and years!
+> 👩🏻‍💻 Rate and view your professors from various modules, semesters and years!
 
 A Django based RESTful API project that allows students to rate the teaching of professors in various modules - it makes SQL queries to the database to add, update and view ratings.
 

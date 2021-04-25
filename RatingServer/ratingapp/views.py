@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Avg
 from .models import Professor, Module, Rating
@@ -15,24 +15,32 @@ def home():
 @csrf_exempt
 def HandleRegister(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        json_data = json.loads(request.body)
+
+        username = json_data.get('username')
+        email = json_data.get('email')
+        password = json_data.get('password')
+
+        print(username, email, password)
 
         if not (User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists()):
             User.objects.create_user(username=username, email=email, password=password)
             return HttpResponse('user created!')
         else:
             return HttpResponse('Username with that email or password already exists')
-
+    print(request.data)
     return HttpResponse('connected to register! api!')
 
 
 @csrf_exempt
 def HandleLogin(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        json_data = json.loads(request.body)
+
+        username = json_data.get('username')
+        password = json_data.get('password')
+        print(username)
+        print(password)
 
         user = authenticate(request, username=username, password=password)
 
@@ -99,7 +107,8 @@ def HandleList(request):
     http_response.status_code = 200
     http_response.reason_phrase = 'OK'
 
-    return http_response
+    # return http_response
+    return JsonResponse(payload, status=200)
 
 
 def HandleView(request):
@@ -140,8 +149,10 @@ def HandleView(request):
 @csrf_exempt
 def HandleAverage(request):
     if request.method == 'POST':
-        user_professor_id = request.POST.get('professor_id')
-        user_module_code = request.POST.get('module_code')
+        json_data = json.loads(request.body)
+
+        user_professor_id = json_data.get('professor_id')
+        user_module_code = json_data.get('module_code')
 
         rating_for_mod = Rating.objects.filter(which_professor__professor_id=user_professor_id,
                                                which_module__module_code=user_module_code).aggregate(Avg('rating'))
@@ -162,11 +173,13 @@ def HandleAverage(request):
 @csrf_exempt
 def HandleRate(request):
     if request.method == 'POST':
-        user_professor_id = request.POST.get('professor_id')
-        user_module_code = request.POST.get('module_code')
-        user_year = request.POST.get('year')
-        user_semester = request.POST.get('semester')
-        user_rating = request.POST.get('rating')
+        json_data = json.loads(request.body)
+
+        user_professor_id = json_data.get('professor_id')
+        user_module_code = json_data.get('module_code')
+        user_year = json_data.get('year')
+        user_semester = json_data.get('semester')
+        user_rating = json_data.get('rating')
 
         prof_search = Professor.objects.get(professor_id=user_professor_id)
 
@@ -175,10 +188,14 @@ def HandleRate(request):
                                            semester=user_semester,
                                            taught_by=prof_search)
 
-        Rating.objects.create(rating=user_rating,
-                              which_professor=prof_search,
-                              which_module=module_search)
+        if prof_search is None or module_search is None:
+            return HttpResponse("The module taught by the professor doesn't exist")
 
-        return HttpResponse('Rating created! ')
+        else:
+            Rating.objects.create(rating=user_rating,
+                                  which_professor=prof_search,
+                                  which_module=module_search)
+
+            return HttpResponse('Rating created! ')
 
     return HttpResponse('Rating page')

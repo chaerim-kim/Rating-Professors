@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <div id="app">
+      <!-- <div id="app"> -->
         <v-col cols="12">
           <h2 class="display-2 m-3 text-center">Average Rating</h2>
         </v-col>
@@ -15,9 +15,9 @@
           </section>
 
           <section v-else>
-            <div v-if="loading">Loading...</div>
+            <!-- <div v-if="loading">Loading...</div> -->
 
-            <div v-else>
+            <div >
               <form>
                 <v-text-field v-model="form.professor_id" label="Professor ID">
                 </v-text-field>
@@ -31,7 +31,7 @@
             </div>
           </section>
         </v-col>
-      </div>
+      <!-- </div> -->
     </v-row>
   </v-container>
 </template>
@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       flashMessage: "",
-      loading: true,
+    //   loading: true,
       errored: false,
       
       form: {

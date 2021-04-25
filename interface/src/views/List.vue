@@ -1,12 +1,12 @@
 <template>
   <v-container>
     <v-row>
-      <div id="app">
+      <!-- <div id="app"> -->
         <v-col cols="12">
           <h2 class="display-2 m-3 text-center">List all items</h2>
         </v-col>
 
-        <v-col>
+        <v-col >
           <section v-if="errored">
             <p>
               We're sorry, we're not able to retrieve this information at the
@@ -45,7 +45,7 @@
             </div>
           </section>
         </v-col>
-      </div>
+      <!-- </div> -->
     </v-row>
   </v-container>
 </template>

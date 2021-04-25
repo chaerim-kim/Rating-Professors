@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <div id="app">
+      <!-- <div id="app"> -->
         <v-col cols="12">
           <h2 class="display-2 m-3 text-center">Rate Professors</h2>
         </v-col>
@@ -39,7 +39,7 @@
             </div>
           </section>
         </v-col>
-      </div>
+      <!-- </div> -->
     </v-row>
   </v-container>
 </template>

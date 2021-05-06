@@ -1,8 +1,7 @@
 <template>
   <v-container>
-    <v-row>
-      <v-flex>
-        <v-col cols="12">
+    <v-row align="center" justify="center">
+        <v-col cols="8">
           <!-- margin by 3 all sides -->
           <h2 class="display-2 m-3 text-center">Login</h2>
           <p class="text-xs-center">
@@ -20,7 +19,7 @@
           </form>
           <p>{{ flashMessage }}</p>
         </v-col>
-      </v-flex>
+      <!-- </v-flex> -->
     </v-row>
   </v-container>
 </template>

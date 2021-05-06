@@ -1,12 +1,12 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row align="center" justify="center">
       <!-- <div id="app"> -->
         <v-col cols="12">
           <h2 class="display-2 m-3 text-center">Average Rating</h2>
         </v-col>
 
-        <v-col>
+        <v-col cols= "8">
           <section v-if="errored">
             <p>
               We're sorry, we're not able to retrieve this information at the

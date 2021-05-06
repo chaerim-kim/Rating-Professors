@@ -1,12 +1,12 @@
 <template>
   <v-container>
-    <v-row>
-        <v-col cols="12">
+    <v-row align="center" justify="center">
+        <v-col cols="8">
         <!-- margin by 3 all sides -->
         <h2 class="display-2 m-3 text-center">Sign up</h2>
-        </v-col>
+        <!-- </v-col> -->
 
-        <v-col cols="6" align="center">
+        <!-- <v-col cols="6" align="center"> -->
             <p class="text-xs-center">
                 <router-link :to="{ name: 'login' }"> Have an account? </router-link>
             </p>

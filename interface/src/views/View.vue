@@ -6,7 +6,7 @@
         <h2 class="display-2 m-3 text-center">View Ratings of Professors</h2>
       </v-col>
 
-      <v-col cols="6">
+      <v-col >
         <section v-if="errored">
           <p>
             We're sorry, we're not able to retrieve this information at the
